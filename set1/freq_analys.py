@@ -1,5 +1,6 @@
 import string
 import math
+import re
 
 ENGLISH_FREQ = {
     'A': 0.08167,
@@ -30,6 +31,16 @@ ENGLISH_FREQ = {
     'Z': 0.00074
 }
 
+def load_ngrams_freq(filename: str, sep: str=' ') -> dict:
+    data = {}
+    with open(filename, 'r') as f:
+        for line in f.readlines():
+            d = line.strip().split(sep)
+            data[d[0]] = int(d[1])
+    N = sum(v for v in data.values())
+    freq = {k: v/N for k, v in data.items()}
+    return freq
+
 def count_letters(s: str) -> dict:
     """Return dict of number letters in string s
     """
@@ -42,12 +53,11 @@ def count_letters(s: str) -> dict:
 def chi_squared(s: str) -> float:
     """Chi-squared statistic value of s against English distribution
     """
-    for c in s:
-        if c not in string.printable:
-            return math.inf
+    if not all(c in string.printable for c in s):
+        return math.inf
 
     C = count_letters(s)
-    total = sum(v for v in C.values())
+    total = sum(C.values())
     if not total: return math.inf
     chi_stat = 0.0
     for i in string.ascii_uppercase:
@@ -55,6 +65,20 @@ def chi_squared(s: str) -> float:
         diff = C[i] - expected
         chi_stat += (diff*diff / expected)
     return chi_stat
+
+def index_of_coin(s: str) -> float:
+    """Compute Index of Coincidence (IC)"""
+    if not all(c in string.printable for c in s):
+        return math.inf
+    s = re.sub(r'[^A-Z]', '', s.upper())
+    N = len(s)
+    if not N: return math.inf
+    IC = 0
+    for c in string.ascii_uppercase:
+        count = s.count(c)
+        IC += count * (count - 1)
+    IC /= N * (N - 1)
+    return IC
 
 def break_single_byte_xor(cipher: bytes) -> (str, float):
     msg = None
