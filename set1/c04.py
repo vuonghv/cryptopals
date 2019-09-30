@@ -14,7 +14,7 @@ if __name__ == '__main__':
                 min_score = score
                 key = k
                 msg = s
-    
+
     print("Solution for Matasano's crypto challenge 04\n")
     print("key          : {}".format(hex(key)))
     print("decrypted msg: {}".format(msg))

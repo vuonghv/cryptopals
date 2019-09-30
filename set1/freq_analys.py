@@ -110,4 +110,3 @@ def break_single_byte_xor(cipher: bytes, score_func) -> (float, int, str):
             key = k
             msg = s
     return (min_score, key, msg)
-
