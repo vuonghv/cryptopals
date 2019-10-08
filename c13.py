@@ -31,6 +31,7 @@ ENGLISH_FREQ = {
     'Y': 0.0145984,
     'Z': 0.0007836,
     ' ': 0.1918182,
+    # I don't know why I have this frequency for punctuations
     '*': 0.0000010  # present all punctuations as `*`
 }
 
