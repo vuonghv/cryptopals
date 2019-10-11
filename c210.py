@@ -35,6 +35,27 @@ def aes_cbc_decrypt(cipher: bytes, key: bytes, iv: bytes) -> bytes:
     return out
 
 
+def aes_ecb_encrypt(data: bytes, key: bytes) -> bytes:
+    data = padding_pkcs7(data, block_size=AES_BLOCK_SIZE)
+    out = b''
+    for i in range(0, len(data) // AES_BLOCK_SIZE):
+        block = data[AES_BLOCK_SIZE*i: AES_BLOCK_SIZE*(i+1)]
+        cipher = aes_encrypt(block, key)
+        out += cipher
+    return out
+
+
+def aes_ecb_decrypt(cipher: bytes, key: bytes) -> bytes:
+    assert len(cipher) % AES_BLOCK_SIZE == 0, len(cipher)
+    out = b''
+    for i in range(0, len(cipher) // AES_BLOCK_SIZE):
+        block = cipher[AES_BLOCK_SIZE*i: AES_BLOCK_SIZE*(i+1)]
+        plain = aes_decrypt(block, key)
+        out += plain
+    out = remove_padding_pkcs7(out)
+    return out
+
+
 if __name__ == '__main__':
     data = b'ATTACK AT DAWN'
     key = b'YELLOW SUBMARINE'
@@ -42,6 +63,11 @@ if __name__ == '__main__':
 
     cipher = aes_cbc_encrypt(data, key, iv)
     decrypt = aes_cbc_decrypt(cipher, key, iv)
+    assert len(cipher) == 16, len(cipher)
+    assert decrypt == data
+
+    cipher = aes_ecb_encrypt(data, key)
+    decrypt = aes_ecb_decrypt(cipher, key)
     assert len(cipher) == 16, len(cipher)
     assert decrypt == data
 
